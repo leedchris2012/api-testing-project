@@ -9,6 +9,8 @@ test.describe('Carts CRUD', () => {
     products: [{ productId: 1, quantity: 2 }],
   };
 
+  // Checks that a shopper adding a new cart (with items in it) is saved
+  // correctly and linked to the right user.
   test('creates a new cart', async ({ cartsApi }) => {
     const response = await cartsApi.create(newCart);
     expect(response.status()).toBe(201);
@@ -18,6 +20,8 @@ test.describe('Carts CRUD', () => {
     expect(created.userId).toBe(newCart.userId);
   });
 
+  // Checks that changing the contents of an existing cart (e.g. updating
+  // the quantity of an item) saves correctly.
   test('updates an existing cart', async ({ cartsApi }) => {
     const response = await cartsApi.update(1, { products: [{ productId: 1, quantity: 5 }] });
     expect(response.status()).toBe(200);
@@ -27,6 +31,7 @@ test.describe('Carts CRUD', () => {
     expect(body.products).toEqual([{ productId: 1, quantity: 5 }]);
   });
 
+  // Checks that removing a shopping cart through the API succeeds.
   test('deletes a cart', async ({ cartsApi }) => {
     const response = await cartsApi.delete(1);
     expect(response.status()).toBe(200);
@@ -37,6 +42,9 @@ test.describe('Carts CRUD', () => {
 });
 
 test.describe('Carts negative cases', () => {
+  // Checks what happens when someone asks for a shopping cart that
+  // doesn't exist — confirms the app responds gracefully instead of
+  // erroring out.
   test('returns null for a non-existent cart id', async ({ cartsApi }) => {
     // Unlike products, carts return literal `null` (not an empty body)
     // for an unknown id.

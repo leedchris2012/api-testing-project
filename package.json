@@ -6,7 +6,9 @@
     "typecheck": "tsc --noEmit",
     "test": "playwright test",
     "test:smoke": "playwright test --grep @smoke",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "test:perf:smoke": "k6 run performance/smoke.js",
+    "test:perf:load": "k6 run performance/load.js"
   },
   "dependencies": {
     "zod": "^3.23.8"

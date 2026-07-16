@@ -16,6 +16,9 @@ validation, and a CI pipeline.
   of the Page Object Model.
 - **CI/CD**: GitHub Actions runs the full suite on every push/PR and
   uploads the HTML report as a build artifact.
+- **Performance testing**: a small [k6](https://k6.io/) suite
+  (`performance/`) load-tests the same endpoints — see
+  [Performance testing](#performance-testing) below.
 
 ## Getting started
 
@@ -41,7 +44,36 @@ tests/
   carts/
   users/
   auth/
+performance/  # k6 smoke and load scripts
 ```
+
+## Performance testing
+
+A small [k6](https://k6.io/) suite lives in `performance/`, covering the
+same three endpoints exercised functionally above: `GET /products`,
+`GET /products/:id`, and `POST /auth/login`.
+
+```bash
+brew install k6       # one-time, if not already installed
+npm run test:perf:smoke   # 1 VU, 10s — sanity check before running load
+npm run test:perf:load    # ramps to 10 VUs, ~55s total
+```
+
+- **`smoke.js`**: 1 virtual user, 10 seconds. Confirms the endpoints are
+  reachable and responding correctly before spending any load budget —
+  run this first, and always after changing a script.
+- **`load.js`**: ramps to 10 concurrent virtual users over a ~55 second
+  run, asserting a `p(95)` response-time threshold per endpoint (products
+  list, product detail, login) plus one overall error-rate threshold
+  across all requests.
+
+**Why the load profile is intentionally small**: `fakestoreapi.com` is a
+free public mock API operated by someone else, not infrastructure this
+project owns. The goal here is to demonstrate a performance-testing
+workflow — scripting, thresholds, ramping VUs, per-endpoint tagging — and
+catch gross latency regressions, not to stress-test or find the breaking
+point of a third party's free service. A stress, spike, or soak test
+against `fakestoreapi.com` would be inappropriate and isn't included.
 
 ## A note on the API's mock behavior
 
